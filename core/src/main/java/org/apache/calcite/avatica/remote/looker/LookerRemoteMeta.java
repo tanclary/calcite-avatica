@@ -37,6 +37,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -51,7 +52,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -124,7 +124,7 @@ public class LookerRemoteMeta extends RemoteMeta implements Meta {
   /**
    * Helper to disable any SSL and hostname verification when `verifySSL` is false.
    */
-  private void trustAllHosts(HttpsURLConnection connection) {
+  private void trustAllHosts(HttpURLConnection connection) {
     // Create a trust manager that does not validate certificate chains
     TrustManager[] trustAllCerts = new TrustManager[]{
         new X509TrustManager() {
@@ -146,8 +146,8 @@ public class LookerRemoteMeta extends RemoteMeta implements Meta {
     try {
       SSLContext sc = SSLContext.getInstance("SSL");
       sc.init(null, trustAllCerts, new java.security.SecureRandom());
-      connection.setSSLSocketFactory(sc.getSocketFactory());
-      connection.setHostnameVerifier(trustAllHostNames);
+      // connection.setSSLSocketFactory(sc.getSocketFactory());
+      // connection.setHostnameVerifier(trustAllHostNames);
     } catch (NoSuchAlgorithmException | KeyManagementException e) {
       throw new RuntimeException(e);
     }
@@ -169,7 +169,7 @@ public class LookerRemoteMeta extends RemoteMeta implements Meta {
     // makes a proper URL from the API endpoint path as the SDK would.
     String endpoint = sdkTransport.makeUrl(url, Collections.emptyMap(), null);
     URL httpsUrl = new URL(endpoint);
-    HttpsURLConnection connection = (HttpsURLConnection) httpsUrl.openConnection();
+    HttpURLConnection connection = (HttpURLConnection) httpsUrl.openConnection();
 
     // WARNING: You should only set `verifySSL=false` for local/dev instances!!
     if (!sdkTransport.getOptions().getVerifySSL()) {
