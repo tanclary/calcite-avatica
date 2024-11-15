@@ -27,8 +27,8 @@ function snapshot_upload {
         -Dpackaging=jar \
         -Dfile="$3" \
         -DgeneratePom=true \
-        -DrepositoryId=nexus \
-        -Durl=https://nexusrepo.looker.com/repository/maven-snapshots/
+        -DrepositoryId=artifact-registry \
+        -Durl=https://us-maven.pkg.dev/prow-build-looker/looker-maven-snapshots
 }
 
 ./gradlew build && ./gradlew jar && ./gradlew generatePom && (
